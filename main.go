@@ -1,17 +1,21 @@
 package main
 
 import (
-	"Gproject/tool"
-	"Gproject/tool/flag"
+	"Gproject/judge"
+	"fmt"
 	"os"
 )
 
 func main() {
-	f := flag.New()
+	f := judge.NewFlag()
 	f.Parse(os.Args[1:])
-	code := tool.New(f)
-	err := code.Run()
+	code, err := judge.New(f)
 	if err != nil {
+		os.Exit(1)
+	}
+	err = code.Run()
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }
