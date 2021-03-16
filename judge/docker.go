@@ -21,8 +21,8 @@ func CreateImage(ImageName string) error {
 	return nil
 }
 
-func CreateContainer(ImageName, TempFileName string) error {
-	var args = []string{RUN, ImageName, "-f", TempFileName} // docker run <name> <args>
+func CreateContainer(ImageName, TempFilePath, BinName, Language string) error {
+	var args = []string{RUN, ImageName, "-p", TempFilePath, "-f", BinName, "-l", Language} // docker run <name> <args>
 	cmd := exec.Command(DOCKER, args...)
 	result, err := cmd.CombinedOutput()
 	fmt.Print(string(result))
@@ -32,12 +32,12 @@ func CreateContainer(ImageName, TempFileName string) error {
 	return nil
 }
 
-func CallDocker(ImageName, TempFileName string) error {
-	err := CreateImage(ImageName)
+func (c *Code) CallDocker() error {
+	err := CreateImage(c.StudentID)
 	if err != nil {
 		return err
 	}
-	err = CreateContainer(ImageName, TempFileName)
+	err = CreateContainer(c.StudentID, c.TempFilePath, c.BinName, c.Language)
 	if err != nil {
 		return err
 	}

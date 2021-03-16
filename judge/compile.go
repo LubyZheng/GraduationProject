@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"syscall"
 )
 
 func CompileCCmd(bin, src, tempPath string) *exec.Cmd {
@@ -38,17 +39,17 @@ func CompileJavaCmd(src, tempPath string) *exec.Cmd {
 		filepath.Join(tempPath, src))
 }
 
-func Compile(bin, src, tempPath, language string) error {
+func (c *Code) Compile() error {
 	var CompileCmd *exec.Cmd
-	switch language {
+	switch c.Language {
 	case "c":
-		CompileCmd = CompileCCmd(bin, src, tempPath)
+		CompileCmd = CompileCCmd(c.BinName, c.FileName, c.TempFilePath)
 	case "cpp":
-		CompileCmd = CompileCppCmd(bin, src, tempPath)
+		CompileCmd = CompileCppCmd(c.BinName, c.FileName, c.TempFilePath)
 	case "go":
-		CompileCmd = CompileGoCmd(bin, src, tempPath)
+		CompileCmd = CompileGoCmd(c.BinName, c.FileName, c.TempFilePath)
 	case "java":
-		CompileCmd = CompileJavaCmd(src, tempPath)
+		CompileCmd = CompileJavaCmd(c.FileName, c.TempFilePath)
 	default:
 		return fmt.Errorf("the language is not supported")
 	}
@@ -56,5 +57,7 @@ func Compile(bin, src, tempPath, language string) error {
 	if err != nil {
 		return err
 	}
+	CodeResult.CompileTime = int64(CompileCmd.ProcessState.UserTime() + CompileCmd.ProcessState.SystemTime())
+	CodeResult.CompileMemory = CompileCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss
 	return nil
 }
