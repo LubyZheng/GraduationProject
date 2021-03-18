@@ -1,14 +1,13 @@
 package judge
 
 import (
+	"Gproject/contract"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 	"time"
 )
-
-const CODE_DIR = "./code"
 
 type Code struct {
 	FileName     string //文件名
@@ -22,12 +21,7 @@ type Code struct {
 	QuestionId   string //题号
 }
 
-type Result struct {
-	CompileTime   int64 `json:"编译时间(ms)"`
-	CompileMemory int64 `json:"编译内存(kb)"`
-}
-
-var CodeResult = new(Result)
+var CodeResult = new(contract.Result)
 
 func CheckFileExist(path string) (string, error) {
 	file, err := os.Stat(path)
@@ -48,6 +42,12 @@ func NewCode(a *Arguments) *Code {
 	fileType := CheckFileType(fileName)
 	tempFilePath := fmt.Sprintf("%s_%s_%s_", a.StudentID, time.Now().Format("20060102150405"), a.QuestionID)
 	binName := strings.Split(fileName, ".")[0]
+	if a.Time == 0 {
+		a.Time = contract.DefaultExecuteTime
+	}
+	if a.Memory == 0 {
+		a.Memory = contract.DefaultExecuteMemory
+	}
 	return &Code{
 		FileName:     fileName,
 		TempFilePath: tempFilePath,
@@ -67,7 +67,7 @@ func (c *Code) PrepareFile() error {
 		return err
 	}
 	//创建临时文件夹
-	c.TempFilePath, err = ioutil.TempDir(CODE_DIR, c.TempFilePath)
+	c.TempFilePath, err = ioutil.TempDir(contract.CodeDir, c.TempFilePath)
 	if err != nil {
 		return err
 	}
@@ -85,31 +85,31 @@ func (c *Code) PrepareFile() error {
 	return nil
 }
 
-func (c *Code) Run() error {
+func (c *Code) Run() (string, error) {
 	err := c.PrepareFile()
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer os.RemoveAll(c.TempFilePath)
-	err = c.Compile()
+	result, err := c.Compile() //TODO
 	if err != nil {
-		return err
+		return result, err
 	}
 	err = c.CallDocker()
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return "", nil
 }
 
 func Judge() {
 	f := NewFlag()
 	f.Parse(os.Args[1:])
 	code := NewCode(f)
-	err := code.Run()
+	result, err := code.Run()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	fmt.Println(CodeResult)
+	fmt.Println(result)
 }

@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 func CompileCCmd(bin, src, tempPath string) *exec.Cmd {
@@ -39,7 +40,7 @@ func CompileJavaCmd(src, tempPath string) *exec.Cmd {
 		filepath.Join(tempPath, src))
 }
 
-func (c *Code) Compile() error {
+func (c *Code) Compile() (string, error) {
 	var CompileCmd *exec.Cmd
 	switch c.Language {
 	case "c":
@@ -51,13 +52,13 @@ func (c *Code) Compile() error {
 	case "java":
 		CompileCmd = CompileJavaCmd(c.FileName, c.TempFilePath)
 	default:
-		return fmt.Errorf("the language is not supported")
+		return "", fmt.Errorf("the language is not supported")
 	}
 	err := CompileCmd.Run()
 	if err != nil {
-		return err
+		return CodeResult.PackCompileFailResult(), err
 	}
-	CodeResult.CompileTime = int64(CompileCmd.ProcessState.UserTime() + CompileCmd.ProcessState.SystemTime())
-	CodeResult.CompileMemory = CompileCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss
-	return nil
+	CodeResult.CompileTime = fmt.Sprintf("%.3f", float32(CompileCmd.ProcessState.UserTime()+CompileCmd.ProcessState.SystemTime())/float32(time.Millisecond))
+	CodeResult.CompileMemory = fmt.Sprintf("%d", CompileCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss)
+	return "", nil
 }

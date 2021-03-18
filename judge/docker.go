@@ -3,6 +3,7 @@ package judge
 import (
 	"fmt"
 	"os/exec"
+	"strconv"
 )
 
 const (
@@ -21,8 +22,16 @@ func CreateImage(ImageName string) error {
 	return nil
 }
 
-func CreateContainer(ImageName, TempFilePath, BinName, Language string) error {
-	var args = []string{RUN, ImageName, "-p", TempFilePath, "-f", BinName, "-l", Language} // docker run <name> <args>
+func CreateContainer(ImageName, TempFilePath, BinName, Language string, Time, Memory int) error {
+	// docker run <name> <args>
+	var args = []string{
+		RUN, ImageName,
+		"-p", TempFilePath,
+		"-f", BinName,
+		"-l", Language,
+		"-t", strconv.Itoa(Time),
+		"-m", strconv.Itoa(Memory),
+	}
 	cmd := exec.Command(DOCKER, args...)
 	result, err := cmd.CombinedOutput()
 	fmt.Print(string(result))
@@ -37,7 +46,7 @@ func (c *Code) CallDocker() error {
 	if err != nil {
 		return err
 	}
-	err = CreateContainer(c.StudentID, c.TempFilePath, c.BinName, c.Language)
+	err = CreateContainer(c.StudentID, c.TempFilePath, c.BinName, c.Language, c.Time, c.Memory)
 	if err != nil {
 		return err
 	}
