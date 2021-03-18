@@ -40,7 +40,7 @@ func CompileJavaCmd(src, tempPath string) *exec.Cmd {
 		filepath.Join(tempPath, src))
 }
 
-func (c *Code) Compile() (string, error) {
+func (c *Code) Compile() string {
 	var CompileCmd *exec.Cmd
 	switch c.Language {
 	case "c":
@@ -52,13 +52,13 @@ func (c *Code) Compile() (string, error) {
 	case "java":
 		CompileCmd = CompileJavaCmd(c.FileName, c.TempFilePath)
 	default:
-		return "", fmt.Errorf("the language is not supported")
+		return CodeResult.PackCompileFailResult("This language is not supported!")
 	}
-	err := CompileCmd.Run()
+	output, err := CompileCmd.CombinedOutput()
 	if err != nil {
-		return CodeResult.PackCompileFailResult(), err
+		return CodeResult.PackCompileFailResult(string(output))
 	}
 	CodeResult.CompileTime = fmt.Sprintf("%.3f", float32(CompileCmd.ProcessState.UserTime()+CompileCmd.ProcessState.SystemTime())/float32(time.Millisecond))
 	CodeResult.CompileMemory = fmt.Sprintf("%d", CompileCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss)
-	return "", nil
+	return ""
 }

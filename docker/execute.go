@@ -59,7 +59,7 @@ func (j *Judge) Run() string {
 			return
 		}
 	}()
-	output, err := ExecuteCmd.CombinedOutput()
+	_, err := ExecuteCmd.CombinedOutput()
 	if err != nil {
 		if strings.Contains(err.Error(), "kill") {
 			LimitTimeChannel <- true
@@ -69,7 +69,6 @@ func (j *Judge) Run() string {
 		}
 	} else {
 		LimitTimeChannel <- true
-		fmt.Print(string(output))
 		return result.PackPassResult(
 			fmt.Sprintf("%.3f", float32(ExecuteCmd.ProcessState.UserTime()+ExecuteCmd.ProcessState.SystemTime())/float32(time.Millisecond)),
 			fmt.Sprintf("%d", ExecuteCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss),

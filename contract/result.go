@@ -11,9 +11,19 @@ type Result struct {
 	ExecuteMemory string `json:"execute_memory(kb)"`
 }
 
-func (r Result) PackCompileFailResult() string {
+func (r Result) PackCompileFailResult(detail string) string {
 	r.Outcome = "false"
-	r.Detail = "Compile Failed!"
+	r.Detail = detail
+	r.CompileTime = NA
+	r.CompileMemory = NA
+	r.ExecuteTime = NA
+	r.ExecuteMemory = NA
+	return r.ConJson()
+}
+
+func (r Result) PackExecuteFailResult(detail string) string {
+	r.Outcome = "false"
+	r.Detail = detail
 	r.ExecuteTime = NA
 	r.ExecuteMemory = NA
 	return r.ConJson()

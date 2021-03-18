@@ -85,31 +85,23 @@ func (c *Code) PrepareFile() error {
 	return nil
 }
 
-func (c *Code) Run() (string, error) {
+func (c *Code) Run() string {
 	err := c.PrepareFile()
 	if err != nil {
-		return "", err
+		return err.Error()
 	}
 	defer os.RemoveAll(c.TempFilePath)
-	result, err := c.Compile() //TODO
-	if err != nil {
-		return result, err
+	result := c.Compile()
+	if result != "" {
+		return result
 	}
-	err = c.CallDocker()
-	if err != nil {
-		return "", err
-	}
-	return "", nil
+	return c.CallDocker()
 }
 
 func Judge() {
 	f := NewFlag()
 	f.Parse(os.Args[1:])
 	code := NewCode(f)
-	result, err := code.Run()
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+	result := code.Run()
 	fmt.Println(result)
 }
