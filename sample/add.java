@@ -6,6 +6,6 @@ public class add{
         int a,b;
         a = in.nextInt();
         b = in.nextInt();
-        System.out.println(a+b);
+        System.out.print(a+b);
     }
 }

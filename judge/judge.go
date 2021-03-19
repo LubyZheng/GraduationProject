@@ -57,6 +57,7 @@ func NewCode(a *Arguments) *Code {
 		Time:         a.Time,
 		Memory:       a.Memory,
 		StudentID:    a.StudentID,
+		QuestionId:   a.QuestionID,
 	}
 }
 

@@ -1,16 +1,20 @@
 package contract
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type ExecuteResult struct {
-	Outcome       int    `json:"outcome"`
+	Status        int    `json:"status"`
+	Output        string `json:"output"`
 	Detail        string `json:"detail"`
 	ExecuteTime   string `json:"execute_time"`
 	ExecuteMemory string `json:"execute_memory"`
 }
 
-func (r ExecuteResult) PackPassResult(executeTime, executeMemory string) string {
-	r.Outcome = PASS
+func (r ExecuteResult) PackPassResult(output, executeTime, executeMemory string) string {
+	r.Status = PASS
+	r.Output = output
 	r.Detail = "Your code pass!"
 	r.ExecuteTime = executeTime
 	r.ExecuteMemory = executeMemory
@@ -18,15 +22,17 @@ func (r ExecuteResult) PackPassResult(executeTime, executeMemory string) string 
 }
 
 func (r ExecuteResult) PackTimeOutResult() string {
-	r.Outcome = TIMEOUT
-	r.Detail = "Your code can't finish executing in limited time!"
+	r.Status = TIMEOUT
+	r.Output = ""
+	r.Detail = ""
 	r.ExecuteTime = NA
 	r.ExecuteMemory = NA
 	return r.ConJson()
 }
 
 func (r ExecuteResult) PackRunTimeErrorResult(detail string) string {
-	r.Outcome = RunTimeError
+	r.Status = RunTimeError
+	r.Output = ""
 	r.Detail = detail
 	r.ExecuteTime = NA
 	r.ExecuteMemory = NA

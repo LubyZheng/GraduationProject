@@ -4,6 +4,7 @@ import (
 	"Gproject/contract"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os/exec"
 	"strings"
 	"syscall"
@@ -11,11 +12,12 @@ import (
 )
 
 type Judge struct {
-	FileName string
-	FilePath string
-	Language string
-	Time     int
-	Memory   int
+	FileName   string
+	FilePath   string
+	Language   string
+	QuestionID string
+	Time       int
+	Memory     int
 }
 
 func NewJudge() *Judge {
@@ -29,6 +31,8 @@ func (j *Judge) Parse() {
 	flag.StringVar(&j.FilePath, "p", "", "")
 	flag.StringVar(&j.Language, "language", "", "")
 	flag.StringVar(&j.Language, "l", "", "")
+	flag.StringVar(&j.QuestionID, "q", "", "")
+	flag.StringVar(&j.QuestionID, "question", "", "")
 	flag.IntVar(&j.Time, "time", 0, "")
 	flag.IntVar(&j.Time, "t", 0, "")
 	flag.IntVar(&j.Memory, "Memory", 0, "")
@@ -46,6 +50,8 @@ func (j *Judge) Run() string {
 	default:
 		ExecuteCmd = exec.Command(fmt.Sprintf("./%s", fmt.Sprintf("%s/%s", j.FilePath, j.FileName)))
 	}
+	input, _ := ioutil.ReadFile(fmt.Sprintf("%s/%s.in", contract.InputDir, j.QuestionID))
+	ExecuteCmd.Stdin = strings.NewReader(string(input))
 	LimitTimeChannel := make(chan bool, 1)
 	defer close(LimitTimeChannel)
 	//计时
@@ -59,7 +65,7 @@ func (j *Judge) Run() string {
 			return
 		}
 	}()
-	_, err := ExecuteCmd.CombinedOutput()
+	output, err := ExecuteCmd.CombinedOutput()
 	if err != nil {
 		if strings.Contains(err.Error(), "kill") {
 			LimitTimeChannel <- true
@@ -70,6 +76,7 @@ func (j *Judge) Run() string {
 	} else {
 		LimitTimeChannel <- true
 		return result.PackPassResult(
+			string(output),
 			fmt.Sprintf("%.3f", float32(ExecuteCmd.ProcessState.UserTime()+ExecuteCmd.ProcessState.SystemTime())/float32(time.Millisecond)),
 			fmt.Sprintf("%d", ExecuteCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss),
 		)

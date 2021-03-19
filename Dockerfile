@@ -15,7 +15,8 @@ RUN yum install -y java-1.8.0-openjdk* #Java
 RUN mkdir code
 
 COPY ./code /code
-COPY ./docker/execute /
+COPY ./docker /
+COPY ./input /input
 
 #WORKDIR /code
 
