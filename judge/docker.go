@@ -26,10 +26,12 @@ func CreateImage(ImageName string) string {
 	return ""
 }
 
-func CreateContainer(ImageName, TempFilePath, BinName, Language, QuestionId string, Time, Memory int) string {
+func CreateContainer(Name, TempFilePath, BinName, Language, QuestionId string, Time, Memory int) string {
 	// docker run <name> <args>
 	var args = []string{
-		RUN, ImageName,
+		RUN,
+		"--name", Name, //容器名
+		"--privileged", Name, //镜像名
 		"-p", TempFilePath,
 		"-q", QuestionId,
 		"-f", BinName,
@@ -42,6 +44,7 @@ func CreateContainer(ImageName, TempFilePath, BinName, Language, QuestionId stri
 	if err != nil {
 		return CodeResult.PackExecuteFailResult(err.Error())
 	}
+	fmt.Println(string(result))
 	var temp contract.ExecuteResult
 	json.Unmarshal(result, &temp)
 	output, _ := ioutil.ReadFile(fmt.Sprintf("%s/%s.out", contract.OutputDir, QuestionId))
@@ -62,5 +65,13 @@ func (c *Code) CallDocker() string {
 		return result
 	}
 	result = CreateContainer(c.StudentID, c.TempFilePath, c.BinName, c.Language, c.QuestionId, c.Time, c.Memory)
+	RemoveContainerAndImage(c.StudentID)
 	return result
+}
+
+func RemoveContainerAndImage(Name string) {
+	cmd := exec.Command("docker", "rm", Name)
+	cmd.Run()
+	cmd = exec.Command("docker", "rmi", Name)
+	cmd.Run()
 }

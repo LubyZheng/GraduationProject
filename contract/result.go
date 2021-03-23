@@ -5,9 +5,9 @@ import "encoding/json"
 type Result struct {
 	Outcome       string `json:"outcome"`
 	Detail        string `json:"detail"`
-	CompileTime   string `json:"compile_time(ms)"`
+	CompileTime   string `json:"compile_time(ms)"` //CPU时间，不包含sleep,阻塞等
 	CompileMemory string `json:"compile_memory(kb)"`
-	ExecuteTime   string `json:"execute_time(ms)"`
+	ExecuteTime   string `json:"execute_time(ms)"`//CPU时间，不包含sleep,阻塞等
 	ExecuteMemory string `json:"execute_memory(kb)"`
 }
 

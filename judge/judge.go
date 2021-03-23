@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -73,7 +74,7 @@ func (c *Code) PrepareFile() error {
 		return err
 	}
 	//创建临时文件
-	file, err := os.Create(fmt.Sprintf("%s/%s", c.TempFilePath, c.FileName))
+	file, err := os.Create(filepath.Join(c.TempFilePath, c.FileName))
 	if err != nil {
 		return err
 	}

@@ -5,10 +5,11 @@ const NA = "N/A"
 const (
 	PASS = iota
 	WRONG
-	CompileFail
-	TIMEOUT
-	MemoryOut
+	CompileFailError
+	TimeOutError
+	MemoryOutError
 	RunTimeError
+	UnknownError
 )
 
 const (

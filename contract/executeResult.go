@@ -15,16 +15,25 @@ type ExecuteResult struct {
 func (r ExecuteResult) PackPassResult(output, executeTime, executeMemory string) string {
 	r.Status = PASS
 	r.Output = output
-	r.Detail = "Your code pass!"
+	r.Detail = NA
 	r.ExecuteTime = executeTime
 	r.ExecuteMemory = executeMemory
 	return r.ConJson()
 }
 
 func (r ExecuteResult) PackTimeOutResult() string {
-	r.Status = TIMEOUT
-	r.Output = ""
-	r.Detail = ""
+	//status作为标志位在程序内提前赋值，用来区分kill是因为超时还是超内存
+	r.Output = NA
+	r.Detail = NA
+	r.ExecuteTime = NA
+	r.ExecuteMemory = NA
+	return r.ConJson()
+}
+
+func (r ExecuteResult) PackMemoryOutErrorResult() string {
+	r.Status = MemoryOutError
+	r.Output = NA
+	r.Detail = NA
 	r.ExecuteTime = NA
 	r.ExecuteMemory = NA
 	return r.ConJson()
@@ -32,7 +41,16 @@ func (r ExecuteResult) PackTimeOutResult() string {
 
 func (r ExecuteResult) PackRunTimeErrorResult(detail string) string {
 	r.Status = RunTimeError
-	r.Output = ""
+	r.Output = NA
+	r.Detail = detail
+	r.ExecuteTime = NA
+	r.ExecuteMemory = NA
+	return r.ConJson()
+}
+
+func (r ExecuteResult) PackUnknownErrorResult(detail string) string {
+	r.Status = UnknownError
+	r.Output = NA
 	r.Detail = detail
 	r.ExecuteTime = NA
 	r.ExecuteMemory = NA
