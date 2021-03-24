@@ -16,6 +16,6 @@ const (
 	CodeDir              = "./code"
 	InputDir             = "./input"
 	OutputDir            = "./output"
-	DefaultExecuteTime   = 5000
-	DefaultExecuteMemory = 10000
+	DefaultExecuteTime   = 10000 //10s
+	DefaultExecuteMemory = 65536 //65536kb
 )

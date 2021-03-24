@@ -1,21 +1,21 @@
 package main
 
 import (
-	"Gproject/cgroup"
 	"Gproject/contract"
+	"Gproject/docker/cgroup"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
-	"syscall"
 	"time"
 )
 
-var result contract.Result
+var result contract.ExecuteResult
 
-type Judge struct {
+type Flag struct {
 	FileName   string
 	FilePath   string
 	Language   string
@@ -24,28 +24,47 @@ type Judge struct {
 	Memory     int
 }
 
-func NewJudge() *Judge {
-	return &Judge{}
+func NewFlag() *Flag {
+	return &Flag{}
 }
 
-func (j *Judge) Parse() {
-	flag.StringVar(&j.FileName, "file", "", "")
-	flag.StringVar(&j.FileName, "f", "", "")
-	flag.StringVar(&j.FilePath, "path", "", "")
-	flag.StringVar(&j.FilePath, "p", "", "")
-	flag.StringVar(&j.Language, "language", "", "")
-	flag.StringVar(&j.Language, "l", "", "")
-	flag.StringVar(&j.QuestionID, "q", "", "")
-	flag.StringVar(&j.QuestionID, "question", "", "")
-	flag.IntVar(&j.Time, "time", 0, "") // ms
-	flag.IntVar(&j.Time, "t", 0, "")
-	flag.IntVar(&j.Memory, "Memory", 0, "") //kb
-	flag.IntVar(&j.Memory, "m", 0, "")
+func (f *Flag) Parse() {
+	flag.StringVar(&f.FileName, "file", "", "")
+	flag.StringVar(&f.FileName, "f", "", "")
+	flag.StringVar(&f.FilePath, "path", "", "")
+	flag.StringVar(&f.FilePath, "p", "", "")
+	flag.StringVar(&f.Language, "language", "", "")
+	flag.StringVar(&f.Language, "l", "", "")
+	flag.StringVar(&f.QuestionID, "q", "", "")
+	flag.StringVar(&f.QuestionID, "question", "", "")
+	flag.IntVar(&f.Time, "time", 0, "") // ms
+	flag.IntVar(&f.Time, "t", 0, "")
+	flag.IntVar(&f.Memory, "Memory", 0, "") //kb
+	flag.IntVar(&f.Memory, "m", 0, "")
 	flag.Parse()
 }
 
+type Judge struct {
+	FileName   string
+	FilePath   string
+	Language   string
+	QuestionID string
+	Time       time.Duration
+	Memory     int
+}
+
+func NewJudge(f *Flag) *Judge {
+	return &Judge{
+		FileName:   f.FileName,
+		FilePath:   f.FilePath,
+		Language:   f.Language,
+		QuestionID: f.QuestionID,
+		Time:       time.Duration(f.Time) * time.Millisecond, //ms
+		Memory:     f.Memory * 1024,                          //kb
+	}
+}
+
 func (j *Judge) Run() string {
-	var result contract.ExecuteResult
 	var ExecuteCmd *exec.Cmd
 	switch j.Language {
 	case "java":
@@ -67,7 +86,10 @@ func (j *Judge) Run() string {
 	if err != nil {
 		return result.PackUnknownErrorResult(err.Error())
 	}
-	cgroup.LimitMemory(j.Memory * 1024)
+	err = cgroup.LimitMemory(j.Memory)
+	if err != nil {
+		return result.PackUnknownErrorResult(err.Error())
+	}
 
 	//计时
 	go func() {
@@ -75,7 +97,7 @@ func (j *Judge) Run() string {
 		case <-LimitTimeChannel:
 			return
 
-		case <-time.After(time.Duration(j.Time) * time.Millisecond): //计时还包括了SetProc等IO操作，实际用时会更短
+		case <-time.After(j.Time): //计时还包括了SetProc等IO操作，实际用时会更短
 			ExecuteCmd.Process.Kill()
 			result.Status = contract.TimeOutError
 			return
@@ -95,6 +117,7 @@ func (j *Judge) Run() string {
 	errByte, _ := ioutil.ReadAll(stderrPipe)
 
 	err = ExecuteCmd.Wait()
+
 	if result.Status == contract.TimeOutError {
 		return result.PackTimeOutResult()
 	} else {
@@ -102,23 +125,26 @@ func (j *Judge) Run() string {
 	}
 
 	if err != nil {
-		if strings.Contains(string(errByte), "kill") {
+		if strings.Contains(err.Error(), "kill") {
 			return result.PackMemoryOutErrorResult()
 		} else {
 			return result.PackRunTimeErrorResult(string(errByte))
 		}
-	}else{
+	} else {
+		mem, _ := strconv.Atoi(cgroup.ReadMemory())
+		mem = mem / 1024 //kb
 		return result.PackPassResult(
 			string(outByte),
 			fmt.Sprintf("%.3f", float32(ExecuteCmd.ProcessState.UserTime()+ExecuteCmd.ProcessState.SystemTime())/float32(time.Millisecond)),
-			fmt.Sprintf("%d", ExecuteCmd.ProcessState.SysUsage().(*syscall.Rusage).Maxrss),
+			fmt.Sprintf("%d", mem),
 		)
 	}
 }
 
 func main() {
-	Judge := NewJudge()
-	Judge.Parse()
+	Flag := NewFlag()
+	Flag.Parse()
+	Judge := NewJudge(Flag)
 	result := Judge.Run()
 	fmt.Println(result)
 }
