@@ -1,112 +1,109 @@
-package main
+package judge
 
 import (
-	"flag"
+	"Gproject/contract"
 	"fmt"
+	"io/ioutil"
 	"os"
-	"os/exec"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
-type Judge struct {
-	File     string
-	Language string
-	Time     int
-	Memory   int
+type Code struct {
+	FileName     string //文件名
+	TempFilePath string //临时文件夹名称
+	FilePath     string //文件路径
+	Language     string //编程语言，web需要,本地文件直接读文件类型
+	BinName      string //可执行文件名
+	Time         int    //限制时间
+	Memory       int    //限制内存
+	StudentID    string //学号
+	QuestionId   string //题号
 }
 
-func NewJudge(d *Default) *Judge {
-	return &Judge{
-		File:     d.FilePath,
-		Language: d.Language,
-		Time:     d.Time,
-		Memory:   d.Memory,
-	}
-}
+var CodeResult = new(contract.Result)
 
-type Default struct {
-	flagSet  *flag.FlagSet
-	FilePath string
-	Language string
-	Time     int
-	Memory   int
-}
-
-func NewFlag() *Default {
-	return &Default{
-		flagSet: flag.NewFlagSet("", flag.ExitOnError),
-	}
-}
-
-func (d *Default) Parse(args []string) {
-	d.flagSet.StringVar(&d.FilePath, "file", "", "")
-	d.flagSet.StringVar(&d.FilePath, "f", "", "")
-	d.flagSet.StringVar(&d.Language, "language", "", "")
-	d.flagSet.StringVar(&d.Language, "l", "", "")
-	d.flagSet.IntVar(&d.Time, "Time", 0, "")
-	d.flagSet.IntVar(&d.Time, "t", 0, "")
-	d.flagSet.IntVar(&d.Memory, "m", 0, "")
-	d.flagSet.IntVar(&d.Memory, "Memory", 0, "")
-	d.flagSet.Usage = d.helpCallback
-	err := d.flagSet.Parse(args)
+func CheckFileExist(path string) (string, error) {
+	file, err := os.Stat(path)
 	if err != nil {
-		os.Exit(0)
+		return "", err
+	}
+	return file.Name(), err
+}
+
+func CheckFileType(FileName string) string {
+	FileNameArray := strings.Split(FileName, ".")
+	FileType := FileNameArray[len(FileNameArray)-1]
+	return FileType
+}
+
+func NewCode(a *Arguments) *Code {
+	fileName, _ := CheckFileExist(a.FilePath)
+	fileType := CheckFileType(fileName)
+	tempFilePath := fmt.Sprintf("%s_%s_%s_", a.StudentID, time.Now().Format("20060102150405"), a.QuestionID)
+	binName := strings.Split(fileName, ".")[0]
+	if a.Time == 0 {
+		a.Time = contract.DefaultExecuteTime
+	}
+	if a.Memory == 0 {
+		a.Memory = contract.DefaultExecuteMemory
+	}
+	return &Code{
+		FileName:     fileName,
+		TempFilePath: tempFilePath,
+		FilePath:     a.FilePath,
+		Language:     fileType,
+		BinName:      binName,
+		Time:         a.Time,
+		Memory:       a.Memory,
+		StudentID:    a.StudentID,
+		QuestionId:   a.QuestionID,
 	}
 }
 
-func (d *Default) helpCallback() {
-	fmt.Printf(
-		"Usage: %s [options]\n"+
-			"Options:\n"+
-			"    -f, --file <name>               FilePath to be executed. ex: xxx.cpp\n"+
-			"    -l, --language <language>       Code language. ex: C++\n"+
-			"    -t, --Time <Time>               Limit Time. unit: ms\n"+
-			"    -m, --momery <Memory>           Limit Memory. unit: kb\n"+
-			"Common Options:\n"+
-			"	 -h, --help                      Show this message\n",
-		os.Args[0],
-	)
-	os.Exit(0)
-}
-
-func (j *Judge) Run() error {
-	//编译
-	var CompileCmd *exec.Cmd
-	switch strings.ToUpper(j.Language) {
-	case "C":
-		CompileCmd = exec.Command("gcc", []string{"-o", "demo", j.File}...)
-	case "C++":
-		CompileCmd = exec.Command("g++", []string{"-o", "demo", j.File}...)
-	case "JAVA":
-		CompileCmd = exec.Command("java", []string{"-o", "demo", j.File}...)
-	case "GO":
-		CompileCmd = exec.Command("go", []string{"build", "-o", "demo", j.File}...)
-	default:
-		return fmt.Errorf("the language is not supported")
-	}
-	err := CompileCmd.Run()
+func (c *Code) PrepareFile() error {
+	//读目标文件
+	b, err := ioutil.ReadFile(c.FilePath)
 	if err != nil {
 		return err
 	}
-	//运行
-	ExecuteCmd := exec.Command("./demo")
-	result, err := ExecuteCmd.CombinedOutput()
+	//创建临时文件夹
+	c.TempFilePath, err = ioutil.TempDir(contract.CodeDir, c.TempFilePath)
 	if err != nil {
 		return err
 	}
-	fmt.Print("输出:", string(result))
-	fmt.Println("编译时间:", CompileCmd.ProcessState.UserTime()+CompileCmd.ProcessState.SystemTime())
-	fmt.Println("运行时间:", ExecuteCmd.ProcessState.UserTime()+ExecuteCmd.ProcessState.SystemTime())
+	//创建临时文件
+	file, err := os.Create(filepath.Join(c.TempFilePath, c.FileName))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	//拷贝源码
+	_, err = file.Write(b)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func main() {
+func (c *Code) Run() string {
+	err := c.PrepareFile()
+	if err != nil {
+		return err.Error()
+	}
+	defer os.RemoveAll(c.TempFilePath)
+	result := c.Compile()
+	if result != "" {
+		return result
+	}
+	return c.CallDocker()
+}
+
+func Judge() {
 	f := NewFlag()
 	f.Parse(os.Args[1:])
-	judge := NewJudge(f)
-	err := judge.Run()
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
+	code := NewCode(f)
+	result := code.Run()
+	fmt.Println(result)
 }
