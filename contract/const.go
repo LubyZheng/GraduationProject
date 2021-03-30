@@ -4,8 +4,6 @@ const NA = "N/A"
 
 const (
 	PASS = iota
-	WRONG
-	CompileFailError
 	TimeOutError
 	MemoryOutError
 	RunTimeError

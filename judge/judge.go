@@ -18,7 +18,7 @@ type Code struct {
 	BinName      string //可执行文件名
 	Time         int    //限制时间
 	Memory       int    //限制内存
-	StudentID    string //学号
+	StudentId    string //学号
 	QuestionId   string //题号
 }
 
@@ -57,7 +57,7 @@ func NewCode(a *Arguments) *Code {
 		BinName:      binName,
 		Time:         a.Time,
 		Memory:       a.Memory,
-		StudentID:    a.StudentID,
+		StudentId:    a.StudentID,
 		QuestionId:   a.QuestionID,
 	}
 }

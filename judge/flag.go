@@ -55,13 +55,15 @@ func (a *Arguments) helpCallback() {
 	fmt.Printf(
 		"\nUsage: %s [options]\n"+
 			"\nOptions:\n"+
-			"    -f,   --file <Name>               FileName. ex: .\\xxx.cpp\n"+
-			"    -l,   --language <Language>       Code language. ex: C++\n"+
+			"    -f,   --file <Name> *             FileName. eg: ./xxx.cpp\n"+
+			"    -l,   --language <Language>       Code language. eg: C++. Automatically identidy from file types\n"+
 			"    -t,   --time <Time>               Limit Time. Unit: ms. Default:10000ms\n"+
 			"    -m,   --momery <Memory>           Limit Memory. Unit: kb. Default:65536kb\n"+
-			"    -sid, <Memory>                    Student's ID\n"+
-			"    -qid, <Question>                  Question's ID\n"+
-			"    -h,   --help                      Show this message\n\n",
+			"    -sid, <Memory>                    Student's ID. Default:nobody\n"+
+			"    -qid, <Question> *                Question's ID.\n"+
+			"    -h,   --help                      Show this message\n"+
+			"\nTips:\n"+
+			"    <*> necessary args\n\n",
 		os.Args[0],
 	)
 	os.Exit(0)

@@ -6,7 +6,7 @@ MAINTAINER lubyzheng@outlook.com
 #ENV GOPATH /code
 #ENV PATH $PATH:$GOROOT/bin
 
-RUN yum install -y java-1.8.0-openjdk* #Java
+RUN yum install -y java-1.8.0-openjdk* #Java的class文件需要JVM解释
 #RUN yum install -y curl gcc gcc-c++
 
 #RUN curl -s -o go.tar.gz https://storage.googleapis.com/golang/go1.16.linux-amd64.tar.gz
@@ -20,4 +20,4 @@ COPY ./input /input
 
 #WORKDIR /code
 
-ENTRYPOINT ["./execute"]
+ENTRYPOINT ["./executor"]

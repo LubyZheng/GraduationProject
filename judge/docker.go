@@ -68,12 +68,12 @@ func CreateContainer(Name, TempFilePath, BinName, Language, QuestionId string, T
 }
 
 func (c *Code) CallDocker() string {
-	result := CreateImage(c.StudentID)
+	result := CreateImage(c.StudentId)
 	if result != "" {
 		return result
 	}
-	result = CreateContainer(c.StudentID, c.TempFilePath, c.BinName, c.Language, c.QuestionId, c.Time, c.Memory)
-	RemoveContainerAndImage(c.StudentID)
+	result = CreateContainer(c.StudentId, c.TempFilePath, c.BinName, c.Language, c.QuestionId, c.Time, c.Memory)
+	RemoveContainerAndImage(c.StudentId)
 	return result
 }
 
