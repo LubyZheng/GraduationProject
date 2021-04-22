@@ -1,6 +1,9 @@
 package contract
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+)
 
 type Result struct {
 	Status        string `json:"status"`
@@ -12,43 +15,43 @@ type Result struct {
 }
 
 func (r Result) PackPassResult(ExecuteTime, ExecuteMemory string) string {
-	r.Status = "Accepted"
+	r.Status = AC
 	r.ExecuteTime = ExecuteTime
 	r.ExecuteMemory = ExecuteMemory
 	return r.ConJson()
 }
 
 func (r Result) PackWrongResult(ExecuteTime, ExecuteMemory string) string {
-	r.Status = "Wrong Answer"
+	r.Status = WA
 	r.ExecuteTime = ExecuteTime
 	r.ExecuteMemory = ExecuteMemory
 	return r.ConJson()
 }
 
 func (r Result) PackCompileFailResult(Detail string) string {
-	r.Status = "Compile Error"
+	r.Status = CE
 	r.Detail = Detail
 	return r.ConJson()
 }
 
 func (r Result) PackTimeOutErrorResult() string {
-	r.Status = "Time Limit Exceeded"
+	r.Status = TLE
 	return r.ConJson()
 }
 
 func (r Result) PackMemoryOutErrorResult() string {
-	r.Status = "Memory Limit Exceeded"
+	r.Status = MLE
 	return r.ConJson()
 }
 
 func (r Result) PackRunTimeErrorResult(Detail string) string {
-	r.Status = "Runtime Error"
+	r.Status = RE
 	r.Detail = Detail
 	return r.ConJson()
 }
 
 func (r Result) PackUnknownErrorResult(Detail string) string {
-	r.Status = "Unknown error"
+	r.Status = UE
 	r.Detail = Detail
 	return r.ConJson()
 }
@@ -58,5 +61,10 @@ func (r Result) ConJson() string {
 	if err != nil {
 		return err.Error()
 	}
-	return string(b)
+	var out bytes.Buffer
+	err = json.Indent(&out, b, "", "\t")
+	if err != nil {
+		return err.Error()
+	}
+	return string(out.Bytes())
 }

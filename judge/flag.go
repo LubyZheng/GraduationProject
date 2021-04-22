@@ -59,8 +59,8 @@ func (a *Arguments) helpCallback() {
 			"    -l,   --language <Language>       Code language. eg: C++. Automatically identidy from file types\n"+
 			"    -t,   --time <Time>               Limit Time. Unit: ms. Default:10000ms\n"+
 			"    -m,   --momery <Memory>           Limit Memory. Unit: kb. Default:65536kb\n"+
-			"    -sid, <Memory>                    Student's ID. Default:nobody\n"+
-			"    -qid, <Question> *                Question's ID.\n"+
+			"    -sid, <StudentID>                 Student's ID. Default:nobody\n"+
+			"    -qid, <QuestionID> *              Question's ID.\n"+
 			"    -h,   --help                      Show this message\n"+
 			"\nTips:\n"+
 			"    <*> necessary args\n\n",

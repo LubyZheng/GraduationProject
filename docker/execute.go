@@ -123,7 +123,6 @@ func (j *Judge) Run() string {
 	} else {
 		LimitTimeChannel <- true //通知计时关闭
 	}
-
 	if err != nil {
 		if strings.Contains(err.Error(), "kill") {
 			return result.PackMemoryOutErrorResult()

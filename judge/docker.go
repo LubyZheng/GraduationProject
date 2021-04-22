@@ -34,7 +34,8 @@ func CreateContainer(Name, TempFilePath, BinName, Language, QuestionId string, T
 	var args = []string{
 		RUN,
 		"--name", Name, //容器名
-		"--privileged", Name, //镜像名
+		"--network", "none", //禁用网络
+		"--privileged", Name, //因cgroup需要root权限，此处需要给Docker添加权限
 		"-p", TempFilePath,
 		"-q", QuestionId,
 		"-f", BinName,

@@ -11,6 +11,16 @@ const (
 )
 
 const (
+	AC  = "Accepted"
+	WA  = "Wrong Answer"
+	CE  = "Compile Error"
+	TLE = "Time Limit Exceeded"
+	MLE = "Memory Limit Exceeded"
+	RE  = "Runtime Error"
+	UE  = "Unknown Error"
+)
+
+const (
 	CodeDir              = "./code"
 	InputDir             = "./input"
 	OutputDir            = "./output"
