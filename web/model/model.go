@@ -1,8 +1,9 @@
 package model
 
 type Request struct {
-	Language string `json:"language"`
-	Code     string `json:"code"`
+	QuestionID string `json:"questionid"`
+	Language   string `json:"language"`
+	Code       string `json:"code"`
 }
 
 type Response struct {
