@@ -1,4 +1,4 @@
-package judge
+package judger
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 )
-
 
 func CompileCCmd(bin, src, tempPath string) *exec.Cmd {
 	return exec.Command(

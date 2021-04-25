@@ -1,6 +1,8 @@
-package contract
+//For judger
+package judger
 
 import (
+	"Gproject/sandbox/constants"
 	"bytes"
 	"encoding/json"
 )
@@ -15,43 +17,43 @@ type Result struct {
 }
 
 func (r Result) PackPassResult(ExecuteTime, ExecuteMemory string) string {
-	r.Status = AC
+	r.Status = constants.AC
 	r.ExecuteTime = ExecuteTime
 	r.ExecuteMemory = ExecuteMemory
 	return r.ConJson()
 }
 
 func (r Result) PackWrongResult(ExecuteTime, ExecuteMemory string) string {
-	r.Status = WA
+	r.Status = constants.WA
 	r.ExecuteTime = ExecuteTime
 	r.ExecuteMemory = ExecuteMemory
 	return r.ConJson()
 }
 
 func (r Result) PackCompileFailResult(Detail string) string {
-	r.Status = CE
+	r.Status = constants.CE
 	r.Detail = Detail
 	return r.ConJson()
 }
 
 func (r Result) PackTimeOutErrorResult() string {
-	r.Status = TLE
+	r.Status = constants.TLE
 	return r.ConJson()
 }
 
 func (r Result) PackMemoryOutErrorResult() string {
-	r.Status = MLE
+	r.Status = constants.MLE
 	return r.ConJson()
 }
 
 func (r Result) PackRunTimeErrorResult(Detail string) string {
-	r.Status = RE
+	r.Status = constants.RE
 	r.Detail = Detail
 	return r.ConJson()
 }
 
 func (r Result) PackUnknownErrorResult(Detail string) string {
-	r.Status = UE
+	r.Status = constants.UE
 	r.Detail = Detail
 	return r.ConJson()
 }

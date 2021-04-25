@@ -1,4 +1,4 @@
-package contract
+package constants
 
 const NA = "N/A"
 

@@ -15,7 +15,7 @@ RUN yum install -y java-1.8.0-openjdk* #Java的class文件需要JVM解释
 RUN mkdir code
 
 COPY ./code /code
-COPY ./docker /
+COPY ./executor /
 COPY ./input /input
 
 #WORKDIR /code

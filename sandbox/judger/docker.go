@@ -1,7 +1,8 @@
-package judge
+package judger
 
 import (
-	"Gproject/contract"
+	"Gproject/sandbox/constants"
+	result2 "Gproject/sandbox/executor/result"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -20,7 +21,7 @@ const (
 )
 
 func CreateImage(ImageName string) string {
-	var args = []string{BUILD, "-t", ImageName, "."} // docker build -t <name> .
+	var args = []string{BUILD, "-t", ImageName, "."} // executor build -t <name> .
 	cmd := exec.Command(DOCKER, args...)
 	err := cmd.Run()
 	if err != nil {
@@ -30,7 +31,7 @@ func CreateImage(ImageName string) string {
 }
 
 func CreateContainer(Name, TempFilePath, BinName, Language, QuestionId string, Time, Memory int) string {
-	// docker run <name> <args>
+	// executor run <name> <args>
 	var args = []string{
 		RUN,
 		"--name", Name, //容器名
@@ -48,19 +49,19 @@ func CreateContainer(Name, TempFilePath, BinName, Language, QuestionId string, T
 	if err != nil {
 		return CodeResult.PackUnknownErrorResult(err.Error())
 	}
-	var JsonResult contract.ExecuteResult
+	var JsonResult result2.ExecuteResult
 	json.Unmarshal(result, &JsonResult)
 	switch JsonResult.Status {
-	case contract.TimeOutError:
+	case constants.TimeOutError:
 		return CodeResult.PackTimeOutErrorResult()
-	case contract.MemoryOutError:
+	case constants.MemoryOutError:
 		return CodeResult.PackMemoryOutErrorResult()
-	case contract.RunTimeError:
+	case constants.RunTimeError:
 		return CodeResult.PackRunTimeErrorResult(JsonResult.Detail)
-	case contract.UnknownError:
+	case constants.UnknownError:
 		return CodeResult.PackUnknownErrorResult(JsonResult.Detail)
 	}
-	output, _ := ioutil.ReadFile(fmt.Sprintf("%s.out", filepath.Join(contract.OutputDir, QuestionId)))
+	output, _ := ioutil.ReadFile(fmt.Sprintf("%s.out", filepath.Join(constants.OutputDir, QuestionId)))
 	if strings.Compare(JsonResult.Output, string(output)) == 0 {
 		return CodeResult.PackPassResult(JsonResult.ExecuteTime, JsonResult.ExecuteMemory)
 	} else {

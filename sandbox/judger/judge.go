@@ -1,7 +1,7 @@
-package judge
+package judger
 
 import (
-	"Gproject/contract"
+	"Gproject/sandbox/constants"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,7 +22,7 @@ type Code struct {
 	QuestionId   string //题号
 }
 
-var CodeResult = new(contract.Result)
+var CodeResult = new(Result)
 
 func CheckFileExist(path string) (string, error) {
 	file, err := os.Stat(path)
@@ -44,10 +44,10 @@ func NewCode(a *Arguments) *Code {
 	tempFilePath := fmt.Sprintf("%s_%s_%s_", a.StudentID, time.Now().Format("20060102150405"), a.QuestionID)
 	binName := strings.Split(fileName, ".")[0]
 	if a.Time == 0 {
-		a.Time = contract.DefaultExecuteTime
+		a.Time = constants.DefaultExecuteTime
 	}
 	if a.Memory == 0 {
-		a.Memory = contract.DefaultExecuteMemory
+		a.Memory = constants.DefaultExecuteMemory
 	}
 	return &Code{
 		FileName:     fileName,
@@ -69,7 +69,7 @@ func (c *Code) PrepareFile() error {
 		return err
 	}
 	//创建临时文件夹
-	c.TempFilePath, err = ioutil.TempDir(contract.CodeDir, c.TempFilePath)
+	c.TempFilePath, err = ioutil.TempDir(constants.CodeDir, c.TempFilePath)
 	if err != nil {
 		return err
 	}

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"Gproject/contract"
-	"Gproject/docker/cgroup"
+	"Gproject/sandbox/constants"
+	"Gproject/sandbox/executor/cgroup"
+	result2 "Gproject/sandbox/executor/result"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,7 +14,7 @@ import (
 	"time"
 )
 
-var result contract.ExecuteResult
+var result result2.ExecuteResult
 
 type Flag struct {
 	FileName   string
@@ -73,7 +74,7 @@ func (j *Judge) Run() string {
 		ExecuteCmd = exec.Command(fmt.Sprintf("./%s", filepath.Join(j.FilePath, j.FileName)))
 	}
 	//输入
-	input, _ := ioutil.ReadFile(fmt.Sprintf("%s.in", filepath.Join(contract.InputDir, j.QuestionID)))
+	input, _ := ioutil.ReadFile(fmt.Sprintf("%s.in", filepath.Join(constants.InputDir, j.QuestionID)))
 	ExecuteCmd.Stdin = strings.NewReader(string(input))
 
 	stdoutPipe, _ := ExecuteCmd.StdoutPipe()
@@ -99,7 +100,7 @@ func (j *Judge) Run() string {
 
 		case <-time.After(j.Time): //计时还包括了SetProc等IO操作，实际用时会更短
 			ExecuteCmd.Process.Kill()
-			result.Status = contract.TimeOutError
+			result.Status = constants.TimeOutError
 			return
 		}
 	}()
@@ -118,7 +119,7 @@ func (j *Judge) Run() string {
 
 	err = ExecuteCmd.Wait()
 
-	if result.Status == contract.TimeOutError {
+	if result.Status == constants.TimeOutError {
 		return result.PackTimeOutResult()
 	} else {
 		LimitTimeChannel <- true //通知计时关闭
