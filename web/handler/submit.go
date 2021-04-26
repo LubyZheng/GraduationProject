@@ -13,7 +13,14 @@ import (
 	"strings"
 )
 
-func SubmitHandler(ctx *gin.Context) {
+func SubmitGetHandler(ctx *gin.Context) {
+	questionID := ctx.Query("qid")
+	ctx.HTML(http.StatusOK, "submit.html", gin.H{
+		"qid": questionID,
+	})
+}
+
+func SubmitPostHandler(ctx *gin.Context) {
 	s, _ := ioutil.ReadAll(ctx.Request.Body)
 	var RequestBody model.Request
 	json.Unmarshal(s, &RequestBody)
@@ -49,7 +56,7 @@ func SubmitHandler(ctx *gin.Context) {
 		return
 	}
 	cmd := exec.Command(
-		"./sb",
+		"./GPSandbox",
 		"-f", filepath.Join(pwd, fileName),
 		"-qid", RequestBody.QuestionID,
 	)
@@ -61,5 +68,15 @@ func SubmitHandler(ctx *gin.Context) {
 	}
 	var resp model.Response
 	_ = json.Unmarshal(result, &resp)
-	ctx.JSON(http.StatusOK, resp)
+	if len(resp.Detail) == 0 {
+		resp.Detail = "N/A"
+	}
+	ctx.HTML(http.StatusOK, "result.html", gin.H{
+		"status":        resp.Status,
+		"detail":        resp.Detail,
+		"compileTime":   resp.CompileTime,
+		"compileMemory": resp.CompileMemory,
+		"executeTime":   resp.ExecuteTime,
+		"executeMemory": resp.ExecuteMemory,
+	})
 }

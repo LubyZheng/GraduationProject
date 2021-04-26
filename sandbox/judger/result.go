@@ -18,6 +18,7 @@ type Result struct {
 
 func (r Result) PackPassResult(ExecuteTime, ExecuteMemory string) string {
 	r.Status = constants.AC
+	r.Detail = constants.NA
 	r.ExecuteTime = ExecuteTime
 	r.ExecuteMemory = ExecuteMemory
 	return r.ConJson()
@@ -25,6 +26,7 @@ func (r Result) PackPassResult(ExecuteTime, ExecuteMemory string) string {
 
 func (r Result) PackWrongResult(ExecuteTime, ExecuteMemory string) string {
 	r.Status = constants.WA
+	r.Detail = constants.NA
 	r.ExecuteTime = ExecuteTime
 	r.ExecuteMemory = ExecuteMemory
 	return r.ConJson()
@@ -38,11 +40,13 @@ func (r Result) PackCompileFailResult(Detail string) string {
 
 func (r Result) PackTimeOutErrorResult() string {
 	r.Status = constants.TLE
+	r.Detail = constants.NA
 	return r.ConJson()
 }
 
 func (r Result) PackMemoryOutErrorResult() string {
 	r.Status = constants.MLE
+	r.Detail = constants.NA
 	return r.ConJson()
 }
 

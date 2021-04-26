@@ -1,12 +1,12 @@
-<!-- saved from url=(0041)http://acm.hdu.edu.cn/submit.php?pid=1000 -->
+<!-- saved from url=(0046)http://acm.hdu.edu.cn/showproblem.php?pid=1000 -->
 <html>
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf8">
-	<link rel="stylesheet" type="text/css" href="./Submit Your Solution_files/global.css" media="all">
-	<link rel="stylesheet" type="text/css" href="./Submit Your Solution_files/diyinhead.css" media="all">
-	<link rel="stylesheet" type="text/css" href="./Submit Your Solution_files/webinhead.css" media="all">
-	<title>Submit Your Solution</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=GBK">
+	<link rel="stylesheet" type="text/css" href="../static/css/diyinhead.css" media="all">
+	<link rel="stylesheet" type="text/css" href="../static/css/global.css" media="all">
+	<link rel="stylesheet" type="text/css" href="../static/css/webinhead.css" media="all">
+	<title>Problem - 1</title>
 	<style type="text/css">
 		.MathJax_Preview {
 			color: #888
@@ -263,82 +263,45 @@
 <body>
 	<div id="MathJax_Message" style="display: none;"></div>
 	<a name="top"></a>
-	<tbody>
-		<tr>
-			<td>
-				<form name="submitform" id="submitform">
-					<table cellspacing="0" cellpadding="0" width="100%" border="0">
-						<tbody>
-							<tr>
-								<td>
-									<h1 align="center">Submit Your Solution</h1>
-									<div style="color:#1A5CC8" align="center">Current Authenticated Author :2017322041
-									</div><br>
-								</td>
-							</tr>
-							<tr>
-								<td align="center"><br>
-									<input type="hidden">
-									Problem ID&nbsp;<input type="text" id="problemid" class="text40"
-										style="width:120px;background-color:F4FBFF;margin-right:40px" value="1">
-									Language&nbsp;
-									<span style="border:#B7CBFF 1px dashed;width:120px;height:22px;padding:0">
-										<select id="language"
-											style="width:121px;font-size:14px;font-family:Arial;background-color:F4FBFF;margin:-1px">
-											<option value="C" selected="">C</option>
-											<option value="C++">C++</option>
-											<option value="Java">Java</option>
-											<option value="Go">Go</option>
-										</select>
-									</span>
-								</td>
-							</tr>
-							<tr>
-								<td align="center"><br>Source Code</td>
-							</tr>
-							<tr>
-								<td align="center"><br><textarea id="usercode" class="code"
-										style="width: 667px; height: 373px"></textarea></td>
-							</tr>
+	<table align="center" cellspacing="0" cellpadding="0" width="980" border="0" style="word-wrap:break-word">
+		<tbody>
+			<tr>
+				<td align="center">
+					<h1 style="color:#1A5CC8">A + B Problem</h1>
+					<font><b><span style="font-family:Arial;font-size:12px;font-weight:bold;color:green">Time Limit:
+								10000 MS &nbsp;&nbsp;&nbsp;&nbsp;Memory Limit: 65536<br></font><br><br>
 
-							<tr>
-								<td align="center">
-									<br><input type="button" value="Submit" class="button40"
-										onclick="demo()">&nbsp;&nbsp;<input type="reset" value="Reset" class="button40">
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</form>
-			</td>
-		</tr>
+					<div class="panel_title" align="left">Problem Description</div>
+					<div class="panel_content">Calculate <i>A + B</i>.<br></div>
+					<div class="panel_bottom">&nbsp;</div><br>
+					<div class="panel_title" align="left">Input</div>
+					<div class="panel_content">Each line will contain two integers <i>A</i> and <i>B</i>. Process to end
+						of file.<br></div>
+					<div class="panel_bottom">&nbsp;</div><br>
+					<div class="panel_title" align="left">Output</div>
+					<div class="panel_content">For each case, output <i>A + B</i> in one line.<br></div>
+					<div class="panel_bottom">&nbsp;</div><br>
+					<div class="panel_title" align="left">Sample Input</div>
+					<div class="panel_content">
+						<pre><div style="font-family:Courier New,Courier,monospace;">1 1</div></pre>
+					</div>
+					<div class="panel_bottom">&nbsp;</div><br>
+					<div class="panel_title" align="left">Sample Output</div>
+					<div class="panel_content">
+						<pre><div style="font-family:Courier New,Courier,monospace;">2</div></pre>
+					</div>
+					<div class="panel_bottom">&nbsp;</div><br>
+					<center style="font-size:15px;font-family:Arial;font-weight:bold;color:#1A5CC8"><a
+						href="submit?qid=1">Submit</a></center>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</td>
+	</tr>
 	</tbody>
 	</table>
-</body>
 
-<script>
-	function demo() {
-		var request = new XMLHttpRequest();
-		request.open('post', "http://192.168.136.128:8080/submit");
-		request.setRequestHeader('Content-Type', 'application/json');
-		var qid = document.getElementById('problemid').value;
-		var lang = document.getElementById('language').value;
-		var code = document.getElementById('usercode').value;
-		var data = {
-			'questionid': qid,
-			'language': lang,
-			'code': code,
-		};
-		request.onreadystatechange = function () {
-			if (request.readyState == 4) {
-				if (request.status == 200) {
-					// alert(JSON.stringify(request.responseText, null, "\t"));
-					document.write(request.responseText);
-				}
-			}
-		}
-		request.send(JSON.stringify(data))
-	}
-</script>
+</body>
 
 </html>
